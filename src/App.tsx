@@ -1,18 +1,29 @@
-import {EntryElement} from './components/Entry';
+import styled from 'styled-components';
+import {EntryElement} from './components/EntryElement';
+import {UserInput} from './components/UserInput';
 import {useEntries} from './stores/useEntries';
 
-function App() {
-  const {entries, addActivity, addEmotion} = useEntries();
+const Ul = styled.ul`
+  padding: 10px;
+`;
 
-  return (
-    <div>
-      <ul>
+function App() {
+  const {entries} = useEntries();
+
+  const EntryList = () => {
+    return (
+      <Ul>
         {entries.map((entry, key) => (
           <EntryElement entry={entry} key={key} />
         ))}
-      </ul>
-      <button onClick={() => addActivity('go on a run')}>activity</button>
-      <button onClick={() => addEmotion('happy!')}>emotion</button>
+      </Ul>
+    );
+  };
+
+  return (
+    <div className="app">
+      <EntryList />
+      <UserInput />
     </div>
   );
 }

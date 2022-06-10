@@ -2,18 +2,21 @@ import create from 'zustand';
 import {persist} from 'zustand/middleware';
 
 export interface AdditionalData {
+  [key: string]: any;
   color?: string;
-  duration?: number; // in minutes
+  startTime?: Date;
+  endTime?: Date;
   notes?: string;
-  sentiment?: sentiment;
+  sentiment?: Sentiment;
 }
 
-export type sentiment =
-  | 'positive'
-  | 'negative'
-  | 'neutral'
-  | 'mixed'
-  | 'unknown';
+export enum Sentiment {
+  Positive = 'positive',
+  Negative = 'negative',
+  Neutral = 'neutral',
+  Mixed = 'mixed',
+  Unknown = 'unknown',
+}
 
 export interface Activity {
   id: string;
@@ -41,19 +44,21 @@ export type Entry = Activity | Emotion;
 
 export interface UseEntriesData {
   entries: Entry[];
+  selectedEntry: Entry | null;
 
-  addActivity: (name: string, additionalData?: AdditionalData) => void;
-  addEmotion: (overall: string, description?: string) => void;
+  addActivity: (props: {name: string; additionalData?: AdditionalData}) => void;
+  addEmotion: (props: {overall: string; description?: string}) => void;
 
-  repeatEntry: (collectionId: string) => void;
-  patchEntry: (id: string, entry: Entry) => void;
-  deleteEntry: (id: string) => void;
+  repeatEntry: (props: {collectionId: string}) => void;
+  patchEntry: (props: {id: string; entry: Entry}) => void;
+  deleteEntry: (props: {id: string}) => void;
 }
 
 export const useEntries = create(
   persist<UseEntriesData>((set, get) => ({
     entries: [],
-    addActivity: (name, additionalData) => {
+    selectedEntry: null,
+    addActivity: ({name, additionalData}) => {
       const id = Math.random().toString();
       const collectionId = Math.random().toString();
       const timestamp = new Date();
@@ -69,7 +74,7 @@ export const useEntries = create(
         entries: [...state.entries, activity],
       }));
     },
-    addEmotion: (overall, description) => {
+    addEmotion: ({overall, description}) => {
       const id = Math.random().toString();
       const collectionId = Math.random().toString();
       const timestamp = new Date();
@@ -93,7 +98,7 @@ export const useEntries = create(
         entries: [...state.entries, emotion],
       }));
     },
-    repeatEntry: (collectionId) => {
+    repeatEntry: ({collectionId}) => {
       const entry = get().entries.find(
         (entry) => entry.collectionId === collectionId
       );
@@ -104,7 +109,7 @@ export const useEntries = create(
         }));
       }
     },
-    patchEntry: (id, entry) => {
+    patchEntry: ({id, entry}) => {
       set((state) => ({
         ...state,
         entries: state.entries.map((e) => {
@@ -115,7 +120,7 @@ export const useEntries = create(
         }),
       }));
     },
-    deleteEntry: (id) => {
+    deleteEntry: ({id}) => {
       set((state) => ({
         ...state,
         entries: state.entries.filter((e) => e.id !== id),
