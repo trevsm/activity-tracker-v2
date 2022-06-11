@@ -1,0 +1,49 @@
+import styled from 'styled-components';
+import {TimedActivity} from '../../stores/entryTypes';
+import {useEntries} from '../../stores/useEntries';
+
+const PlayButtons = styled.div``;
+
+const BrLi = styled.li<{color?: string}>`
+  border: 1px solid;
+  .main {
+    border-left: 10px solid ${({color}) => color};
+    padding: 5px 10px;
+    display: flex;
+    span.name {
+      display: inline-block;
+      margin-right: 10px;
+    }
+  }
+`;
+
+export const OngoingActivityElement = ({entry}: {entry: TimedActivity}) => {
+  const {patchEntry, repeatEntry} = useEntries();
+
+  const handlePause = () => {
+    const stopTime = new Date();
+    patchEntry({id: entry.id, entry: {stopTime}});
+  };
+
+  const handleStart = () => {
+    repeatEntry({collectionId: entry.collectionId});
+  };
+
+  const handleEnd = () => {};
+
+  return (
+    <BrLi color={entry.additionalData?.color}>
+      <div className="main">
+        <span className="name">{entry.name}</span>
+        <PlayButtons>
+          {entry.stopTime ? (
+            <button onClick={handleStart}>start</button>
+          ) : (
+            <button onClick={handlePause}>pause</button>
+          )}
+          <button>end</button>
+        </PlayButtons>
+      </div>
+    </BrLi>
+  );
+};

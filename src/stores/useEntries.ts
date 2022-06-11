@@ -1,62 +1,36 @@
 import create from 'zustand';
 import {persist} from 'zustand/middleware';
-
-export interface AdditionalData {
-  [key: string]: any;
-  color?: string;
-  startTime?: Date;
-  endTime?: Date;
-  notes?: string;
-  sentiment?: Sentiment;
-}
-
-export enum Sentiment {
-  Positive = 'positive',
-  Negative = 'negative',
-  Neutral = 'neutral',
-  Mixed = 'mixed',
-  Unknown = 'unknown',
-}
-
-export interface Activity {
-  id: string;
-  collectionId: string;
-  timestamp: Date;
-
-  name: string;
-  additionalData?: AdditionalData;
-}
-export const isActivity = (entry: Entry): entry is Activity =>
-  (<Activity>entry).name !== undefined;
-
-export interface Emotion {
-  id: string;
-  collectionId: string;
-  timestamp: Date;
-
-  overall: string;
-  description?: string;
-}
-export const isEmotion = (entry: Entry): entry is Emotion =>
-  (<Emotion>entry).overall !== undefined;
-
-export type Entry = Activity | Emotion;
+import {
+  Entry,
+  Activity,
+  AdditionalData,
+  Emotion,
+  TimedActivity,
+  PartialEntry,
+  isTimedActivity,
+} from './entryTypes';
 
 export interface UseEntriesData {
   entries: Entry[];
+  ongoingActivities: TimedActivity[];
   selectedEntry: Entry | null;
 
   addActivity: (props: {name: string; additionalData?: AdditionalData}) => void;
+  addTimedActivity: (props: {
+    name: string;
+    additionalData?: AdditionalData;
+  }) => void;
   addEmotion: (props: {overall: string; description?: string}) => void;
 
   repeatEntry: (props: {collectionId: string}) => void;
-  patchEntry: (props: {id: string; entry: Entry}) => void;
+  patchEntry: (props: {id: string; entry: PartialEntry}) => void;
   deleteEntry: (props: {id: string}) => void;
 }
 
 export const useEntries = create(
   persist<UseEntriesData>((set, get) => ({
     entries: [],
+    ongoingActivities: [],
     selectedEntry: null,
     addActivity: ({name, additionalData}) => {
       const id = Math.random().toString();
@@ -72,6 +46,23 @@ export const useEntries = create(
       set((state) => ({
         ...state,
         entries: [...state.entries, activity],
+      }));
+    },
+    addTimedActivity: ({name, additionalData}) => {
+      const id = Math.random().toString();
+      const collectionId = Math.random().toString();
+      const startTime = new Date();
+      const timedActivity: TimedActivity = {
+        id,
+        collectionId,
+        startTime,
+        name,
+        additionalData,
+      };
+
+      set((state) => ({
+        entries: [...state.entries, timedActivity],
+        ongoingActivities: [...state.ongoingActivities, timedActivity],
       }));
     },
     addEmotion: ({overall, description}) => {
@@ -93,19 +84,44 @@ export const useEntries = create(
         };
       }
 
-      set((state) => ({
-        ...state,
-        entries: [...state.entries, emotion],
+      set(({entries}) => ({
+        entries: [...entries, emotion],
       }));
     },
     repeatEntry: ({collectionId}) => {
       const entry = get().entries.find(
         (entry) => entry.collectionId === collectionId
       );
+      const id = Math.random().toString();
+
       if (entry) {
-        set((state) => ({
-          ...state,
-          entries: [...state.entries, entry],
+        const newEntry: Entry = {...entry};
+
+        const isTimed = isTimedActivity(newEntry);
+        if (isTimed) {
+          newEntry.startTime = new Date();
+          delete newEntry.stopTime;
+        }
+
+        set(({entries}) => ({
+          entries: [...entries, {...newEntry, id, collectionId}],
+        }));
+
+        if (!isTimed) return;
+      }
+
+      // update ongoing activities
+      const ongoingActivity = get().ongoingActivities.find(
+        (activity) => activity.collectionId === collectionId
+      );
+
+      if (ongoingActivity) {
+        set(({ongoingActivities}) => ({
+          ongoingActivities: ongoingActivities.map((activity) =>
+            activity.collectionId === collectionId
+              ? {...activity, id, stopTime: undefined}
+              : activity
+          ),
         }));
       }
     },
@@ -114,7 +130,13 @@ export const useEntries = create(
         ...state,
         entries: state.entries.map((e) => {
           if (e.id === id) {
-            return entry;
+            return {...e, ...entry};
+          }
+          return e;
+        }),
+        ongoingActivities: state.ongoingActivities.map((e) => {
+          if (e.id === id) {
+            return {...e, ...entry};
           }
           return e;
         }),

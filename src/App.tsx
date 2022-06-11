@@ -1,28 +1,14 @@
-import styled from 'styled-components';
-import {EntryElement} from './components/EntryElement';
-import {UserInput} from './components/UserInput';
-import {useEntries} from './stores/useEntries';
-
-const Ul = styled.ul`
-  padding: 10px;
-`;
+import {EntryList} from './components/Entries/EntryList';
+import {OngoingActivities} from './components/OngoingActivities';
+import {UserInput} from './components/UserInput/UserInput';
 
 function App() {
-  const {entries} = useEntries();
-
-  const EntryList = () => {
-    return (
-      <Ul>
-        {entries.map((entry, key) => (
-          <EntryElement entry={entry} key={key} />
-        ))}
-      </Ul>
-    );
-  };
-
   return (
     <div className="app">
-      <EntryList />
+      <div style={{display: 'flex'}}>
+        <EntryList />
+        <OngoingActivities />
+      </div>
       <UserInput />
     </div>
   );
