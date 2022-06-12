@@ -42,10 +42,9 @@ export interface Emotion {
 
 export type Entry = Activity | TimedActivity | Emotion;
 
-export type PartialEntry =
-  | Partial<Activity>
-  | Partial<TimedActivity>
-  | Partial<Emotion>;
+export type AllPartialEntry = Partial<Activity> &
+  Partial<TimedActivity> &
+  Partial<Emotion>;
 
 // type check methods
 

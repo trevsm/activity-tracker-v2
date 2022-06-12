@@ -1,6 +1,11 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {InputContainer, Hr} from './index';
-import {AdditionalData, Sentiment} from '../../../stores/entryTypes';
+import {
+  AdditionalData,
+  isActivity,
+  isTimedActivity,
+  Sentiment,
+} from '../../../stores/entryTypes';
 import {useEntries} from '../../../stores/useEntries';
 
 export const ActivityForm = ({
@@ -14,16 +19,34 @@ export const ActivityForm = ({
     name: string;
     additionalData: AdditionalData;
   }
-  const [activity, setActivity] = useState<PartialActivity>({
+  const {
+    addActivity,
+    addTimedActivity,
+    selectedEntry,
+    patchCollection,
+    repeatEntry,
+  } = useEntries();
+
+  const initialActivity: PartialActivity = {
     name: '',
     additionalData: {
       color: '#e0f0ff',
+      notes: '',
     },
-  });
+  };
+
+  if (
+    selectedEntry &&
+    (isActivity(selectedEntry) || isTimedActivity(selectedEntry))
+  ) {
+    initialActivity.name = selectedEntry.name;
+    if (selectedEntry.additionalData) {
+      initialActivity.additionalData = selectedEntry.additionalData;
+    }
+  }
+  const [activity, setActivity] = useState<PartialActivity>(initialActivity);
 
   const [showMore, setShowMore] = useState(false);
-
-  const {addActivity, addTimedActivity} = useEntries();
 
   const handleAddNewActivity = () => {
     if (!activity.name) return;
@@ -31,6 +54,23 @@ export const ActivityForm = ({
     if (timed) addTimedActivity(activity);
     else addActivity(activity);
     handleClose();
+  };
+
+  const handleRepeat = () => {
+    if (selectedEntry) {
+      repeatEntry(selectedEntry);
+      handleClose();
+    }
+  };
+
+  const handleSave = () => {
+    if (selectedEntry) {
+      patchCollection({
+        collectionId: selectedEntry.collectionId,
+        entry: activity,
+      });
+      handleClose();
+    }
   };
 
   const handleToggleShowMore = () => {
@@ -46,6 +86,10 @@ export const ActivityForm = ({
       },
     }));
   };
+
+  useEffect(() => {
+    setActivity(initialActivity);
+  }, [selectedEntry]);
 
   return (
     <InputContainer>
@@ -91,6 +135,7 @@ export const ActivityForm = ({
                 setAdditionalData({sentiment: e.target.value as Sentiment})
               }
             >
+              <option value="">---</option>
               {Object.keys(Sentiment).map((value, key) => (
                 <option key={key} value={value}>
                   {value}
@@ -102,8 +147,14 @@ export const ActivityForm = ({
       )}
       {!showMore && <Hr />}
       <button onClick={handleAddNewActivity} type="submit">
-        {timed ? 'Start' : 'Add'} Activity
+        {timed ? 'Start' : 'Add'} New Activity
       </button>
+      <button onClick={handleRepeat}>Repeat</button>
+      {selectedEntry && (
+        <button onClick={handleSave} type="submit">
+          Save
+        </button>
+      )}
     </InputContainer>
   );
 };

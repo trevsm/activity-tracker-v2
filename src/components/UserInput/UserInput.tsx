@@ -1,5 +1,7 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import styled from 'styled-components';
+import {isActivity, isEmotion, isTimedActivity} from '../../stores/entryTypes';
+import {useEntries} from '../../stores/useEntries';
 import {ActivityForm} from './InputForms/ActivityForm';
 import {EmotionForm} from './InputForms/EmotionForm';
 
@@ -10,10 +12,25 @@ const ButtonWrapper = styled.div`
 export function UserInput() {
   type InputType = 'activity' | 'timedActivity' | 'emotion';
   const [type, setType] = useState<InputType | null>(null);
+  const {selectedEntry, selectEntry} = useEntries();
 
   const handleClose = () => {
     setType(null);
+    selectEntry(null);
   };
+
+  const selectType = (type: InputType) => {
+    setType(type);
+    selectEntry(null);
+  };
+
+  useEffect(() => {
+    if (selectedEntry) {
+      if (isActivity(selectedEntry)) setType('activity');
+      if (isTimedActivity(selectedEntry)) setType('timedActivity');
+      if (isEmotion(selectedEntry)) setType('emotion');
+    }
+  }, [selectedEntry]);
 
   return (
     <div>
@@ -22,11 +39,11 @@ export function UserInput() {
       )}
       {type === 'emotion' && <EmotionForm {...{handleClose}} />}
       <ButtonWrapper>
-        <button onClick={() => setType('activity')}>add activity</button>
-        <button onClick={() => setType('timedActivity')}>
+        <button onClick={() => selectType('activity')}>add activity</button>
+        <button onClick={() => selectType('timedActivity')}>
           add timed activity
         </button>
-        <button onClick={() => setType('emotion')}>add emotion</button>
+        <button onClick={() => selectType('emotion')}>add emotion</button>
       </ButtonWrapper>
     </div>
   );

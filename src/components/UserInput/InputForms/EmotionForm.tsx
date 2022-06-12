@@ -1,23 +1,41 @@
 import {useState} from 'react';
 import {InputContainer} from './index';
 import {useEntries} from '../../../stores/useEntries';
+import {isEmotion} from '../../../stores/entryTypes';
 
 export const EmotionForm = ({handleClose}: {handleClose: () => void}) => {
+  const {addEmotion, selectedEntry, patchCollection} = useEntries();
+
   interface PartialEmotion {
     overall: string;
     description?: string;
   }
-  const [emotion, setEmotion] = useState<PartialEmotion>({
+  const initialEmotion: PartialEmotion = {
     overall: '',
     description: '',
-  });
+  };
 
-  const {addEmotion} = useEntries();
+  if (selectedEntry && isEmotion(selectedEntry)) {
+    initialEmotion.overall = selectedEntry.overall;
+    initialEmotion.description = selectedEntry.description;
+  }
+
+  const [emotion, setEmotion] = useState<PartialEmotion>(initialEmotion);
 
   const handleAddNewEmotion = () => {
     if (!emotion.overall) return;
     addEmotion({...emotion});
     handleClose();
+  };
+
+  const handleSave = () => {
+    if (selectedEntry) {
+      patchCollection({
+        collectionId: selectedEntry.collectionId,
+        entry: emotion,
+      });
+      handleClose();
+    }
   };
 
   const handleOverallChange = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -46,6 +64,11 @@ export const EmotionForm = ({handleClose}: {handleClose: () => void}) => {
         ></textarea>
       </label>
       <button onClick={handleAddNewEmotion}>Add New</button>
+      {selectedEntry && (
+        <button onClick={handleSave} type="submit">
+          Save
+        </button>
+      )}
     </InputContainer>
   );
 };

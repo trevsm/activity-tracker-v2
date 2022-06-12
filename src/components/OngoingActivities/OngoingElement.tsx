@@ -6,10 +6,14 @@ const PlayButtons = styled.div``;
 
 const BrLi = styled.li<{color?: string}>`
   border: 1px solid;
+  margin-bottom: 10px;
   .main {
     border-left: 10px solid ${({color}) => color};
     padding: 5px 10px;
     display: flex;
+    button {
+      margin-left: 5px;
+    }
     span.name {
       display: inline-block;
       margin-right: 10px;

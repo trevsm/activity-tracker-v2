@@ -6,7 +6,7 @@ import {
   AdditionalData,
   Emotion,
   TimedActivity,
-  PartialEntry,
+  AllPartialEntry,
   isTimedActivity,
 } from './entryTypes';
 
@@ -22,9 +22,14 @@ export interface UseEntriesData {
   }) => void;
   addEmotion: (props: {overall: string; description?: string}) => void;
   removeOngoingActivity: (id: string) => void;
+  selectEntry: (id: string | null) => void;
 
   repeatEntry: (props: {collectionId: string}) => void;
-  patchEntry: (props: {id: string; entry: PartialEntry}) => void;
+  patchEntry: (props: {id: string; entry: AllPartialEntry}) => void;
+  patchCollection: (props: {
+    collectionId: string;
+    entry: AllPartialEntry;
+  }) => void;
   deleteEntry: (props: {id: string}) => void;
 }
 
@@ -55,6 +60,13 @@ export const useEntries = create(
           (activity) => activity.id !== id
         ),
       }));
+    },
+    selectEntry: (id) => {
+      if (id)
+        set((state) => ({
+          selectedEntry: state.entries.find((entry) => entry.id === id) || null,
+        }));
+      else set({selectedEntry: null});
     },
     addTimedActivity: ({name, additionalData}) => {
       const id = Math.random().toString();
@@ -144,6 +156,23 @@ export const useEntries = create(
         }),
         ongoingActivities: state.ongoingActivities.map((e) => {
           if (e.id === id) {
+            return {...e, ...entry};
+          }
+          return e;
+        }),
+      }));
+    },
+    patchCollection: ({collectionId, entry}) => {
+      set((state) => ({
+        ...state,
+        entries: state.entries.map((e) => {
+          if (e.collectionId === collectionId) {
+            return {...e, ...entry};
+          }
+          return e;
+        }),
+        ongoingActivities: state.ongoingActivities.map((e) => {
+          if (e.collectionId === collectionId) {
             return {...e, ...entry};
           }
           return e;
