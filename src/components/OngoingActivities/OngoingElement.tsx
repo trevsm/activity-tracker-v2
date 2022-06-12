@@ -18,7 +18,7 @@ const BrLi = styled.li<{color?: string}>`
 `;
 
 export const OngoingActivityElement = ({entry}: {entry: TimedActivity}) => {
-  const {patchEntry, repeatEntry} = useEntries();
+  const {patchEntry, repeatEntry, removeOngoingActivity} = useEntries();
 
   const handlePause = () => {
     const stopTime = new Date();
@@ -29,7 +29,10 @@ export const OngoingActivityElement = ({entry}: {entry: TimedActivity}) => {
     repeatEntry({collectionId: entry.collectionId});
   };
 
-  const handleEnd = () => {};
+  const handleEnd = () => {
+    if (!entry.stopTime) handlePause();
+    removeOngoingActivity(entry.id);
+  };
 
   return (
     <BrLi color={entry.additionalData?.color}>
@@ -41,7 +44,7 @@ export const OngoingActivityElement = ({entry}: {entry: TimedActivity}) => {
           ) : (
             <button onClick={handlePause}>pause</button>
           )}
-          <button>end</button>
+          <button onClick={handleEnd}>end</button>
         </PlayButtons>
       </div>
     </BrLi>

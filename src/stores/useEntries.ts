@@ -21,6 +21,7 @@ export interface UseEntriesData {
     additionalData?: AdditionalData;
   }) => void;
   addEmotion: (props: {overall: string; description?: string}) => void;
+  removeOngoingActivity: (id: string) => void;
 
   repeatEntry: (props: {collectionId: string}) => void;
   patchEntry: (props: {id: string; entry: PartialEntry}) => void;
@@ -46,6 +47,13 @@ export const useEntries = create(
       set((state) => ({
         ...state,
         entries: [...state.entries, activity],
+      }));
+    },
+    removeOngoingActivity: (id) => {
+      set((state) => ({
+        ongoingActivities: state.ongoingActivities.filter(
+          (activity) => activity.id !== id
+        ),
       }));
     },
     addTimedActivity: ({name, additionalData}) => {
