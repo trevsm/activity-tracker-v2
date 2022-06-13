@@ -64,7 +64,7 @@ export const EmotionForm = ({handleClose}: {handleClose: () => void}) => {
           <option value="">---</option>
           {(Object.keys(Feeling) as Array<keyof typeof Feeling>).map(
             (value, key) => (
-              <option key={key} value={value}>
+              <option key={key} value={Feeling[value]}>
                 {Feeling[value]}
               </option>
             )
