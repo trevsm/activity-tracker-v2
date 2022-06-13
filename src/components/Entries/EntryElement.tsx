@@ -7,6 +7,7 @@ import {
   isTimedActivity,
   AllPartialEntry,
   TimedActivity,
+  Feeling,
 } from '../../stores/entryTypes';
 import styled from 'styled-components';
 import {AppProps} from '../../types';
@@ -20,6 +21,10 @@ export const BgLi = styled.li<{color?: string}>`
   border: 1px solid;
   pointer-events: auto;
   cursor: pointer;
+`;
+
+const H1 = styled.h1`
+  margin-bottom: 10px;
 `;
 
 interface BaseEntryProps extends AppProps {
@@ -70,23 +75,7 @@ const ActivityEntry = ({entry}: {entry: Activity}) => {
   return (
     <div>
       <BaseEntry entry={entry}>
-        <span>activity: {entry.name}</span>
-        {entry.additionalData && (
-          <ul>
-            {Object.keys(entry.additionalData).map((value, key) => {
-              if (!entry.additionalData) return null;
-
-              const entryValue = entry.additionalData[value];
-              if (!entryValue) return null;
-
-              return (
-                <li key={key}>
-                  {value} : {entryValue}
-                </li>
-              );
-            })}
-          </ul>
-        )}
+        <H1>{entry.name}</H1>
       </BaseEntry>
     </div>
   );
@@ -96,23 +85,7 @@ const TimedActivityEntry = ({entry}: {entry: TimedActivity}) => {
   return (
     <div>
       <BaseEntry entry={entry}>
-        <span>activity: {entry.name}</span>
-        {entry.additionalData && (
-          <ul>
-            {Object.keys(entry.additionalData).map((value, key) => {
-              if (!entry.additionalData) return null;
-
-              const entryValue = entry.additionalData[value];
-              if (!entryValue) return null;
-
-              return (
-                <li key={key}>
-                  {value} : {entryValue}
-                </li>
-              );
-            })}
-          </ul>
-        )}
+        <H1>{entry.name}</H1>
       </BaseEntry>
     </div>
   );

@@ -8,6 +8,7 @@ import {
   TimedActivity,
   AllPartialEntry,
   isTimedActivity,
+  Feeling,
 } from './entryTypes';
 
 export interface UseEntriesData {
@@ -20,7 +21,7 @@ export interface UseEntriesData {
     name: string;
     additionalData?: AdditionalData;
   }) => void;
-  addEmotion: (props: {overall: string; description?: string}) => void;
+  addEmotion: (props: {overall: Feeling; description?: string}) => void;
   removeOngoingActivity: (id: string) => void;
   selectEntry: (id: string | null) => void;
 

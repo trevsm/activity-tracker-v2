@@ -1,18 +1,18 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {ButtonWrapper, InputContainer} from './index';
 import {useEntries} from '../../../stores/useEntries';
-import {isEmotion} from '../../../stores/entryTypes';
+import {Feeling, isEmotion} from '../../../stores/entryTypes';
 
 export const EmotionForm = ({handleClose}: {handleClose: () => void}) => {
   const {addEmotion, selectedEntry, patchCollection, repeatEntry} =
     useEntries();
 
   interface PartialEmotion {
-    overall: string;
+    overall: Feeling;
     description?: string;
   }
   const initialEmotion: PartialEmotion = {
-    overall: '',
+    overall: Feeling.Good,
     description: '',
   };
 
@@ -47,22 +47,29 @@ export const EmotionForm = ({handleClose}: {handleClose: () => void}) => {
     }
   };
 
-  const handleOverallChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setEmotion((prev) => ({...prev, overall: e.target.value}));
+  const handleOverallChange = (e: React.ChangeEvent<HTMLSelectElement>) =>
+    setEmotion((prev) => ({...prev, overall: e.target.value as Feeling}));
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
     setEmotion((prev) => ({...prev, description: e.target.value}));
+
+  useEffect(() => {
+    setEmotion(initialEmotion);
+  }, [selectedEntry]);
 
   return (
     <InputContainer>
       <label>
-        Overall (0-10):
-        <input
-          type="number"
-          value={emotion.overall}
-          onChange={handleOverallChange}
-          min={0}
-          max={10}
-        />
+        Overall:
+        <select value={emotion.overall} onChange={handleOverallChange}>
+          <option value="">---</option>
+          {(Object.keys(Feeling) as Array<keyof typeof Feeling>).map(
+            (value, key) => (
+              <option key={key} value={value}>
+                {Feeling[value]}
+              </option>
+            )
+          )}
+        </select>
       </label>
       <label>
         Description:

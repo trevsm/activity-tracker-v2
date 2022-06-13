@@ -13,6 +13,14 @@ export enum Sentiment {
   Unknown = 'unknown',
 }
 
+export enum Feeling {
+  Great = '😀',
+  Good = '🙂',
+  Meh = '😐',
+  Poor = '🙁',
+  Bad = '😞',
+}
+
 // entry types
 
 interface GeneralActivity {
@@ -36,7 +44,7 @@ export interface Emotion {
   collectionId: string;
   timestamp: Date;
 
-  overall: string;
+  overall: Feeling;
   description?: string;
 }
 
