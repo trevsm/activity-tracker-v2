@@ -18,6 +18,8 @@ export const BgLi = styled.li<{color?: string}>`
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid;
+  pointer-events: auto;
+  cursor: pointer;
 `;
 
 interface BaseEntryProps extends AppProps {

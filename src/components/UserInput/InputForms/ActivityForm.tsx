@@ -149,11 +149,13 @@ export const ActivityForm = ({
       <button onClick={handleAddNewActivity} type="submit">
         {timed ? 'Start' : 'Add'} New Activity
       </button>
-      <button onClick={handleRepeat}>Repeat</button>
       {selectedEntry && (
-        <button onClick={handleSave} type="submit">
-          Save
-        </button>
+        <>
+          <button onClick={handleSave} type="submit">
+            Save
+          </button>
+          <button onClick={handleRepeat}>Repeat</button>
+        </>
       )}
     </InputContainer>
   );

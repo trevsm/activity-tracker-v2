@@ -5,6 +5,7 @@ export const InputContainer = styled.div`
   flex-direction: column;
   max-width: 200px;
   padding: 10px;
+  pointer-events: auto;
   label {
     display: flex;
     flex-direction: column;

@@ -9,7 +9,11 @@ const ButtonWrapper = styled.div`
   padding: 10px;
 `;
 
-export function UserInput() {
+export function UserInput({
+  handleLayerClick,
+}: {
+  handleLayerClick: React.MutableRefObject<() => void>;
+}) {
   type InputType = 'activity' | 'timedActivity' | 'emotion';
   const [type, setType] = useState<InputType | null>(null);
   const {selectedEntry, selectEntry} = useEntries();
@@ -31,6 +35,12 @@ export function UserInput() {
       if (isEmotion(selectedEntry)) setType('emotion');
     }
   }, [selectedEntry]);
+
+  useEffect(() => {
+    handleLayerClick.current = () => {
+      handleClose();
+    };
+  }, []);
 
   return (
     <div>
