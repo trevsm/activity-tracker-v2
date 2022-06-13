@@ -25,6 +25,7 @@ export const ActivityForm = ({
     selectedEntry,
     patchCollection,
     repeatEntry,
+    isOngoingActivity,
   } = useEntries();
 
   const initialActivity: PartialActivity = {
@@ -47,6 +48,8 @@ export const ActivityForm = ({
   const [activity, setActivity] = useState<PartialActivity>(initialActivity);
 
   const [showMore, setShowMore] = useState(false);
+
+  const isEdited = JSON.stringify(activity) !== JSON.stringify(initialActivity);
 
   const handleAddNewActivity = () => {
     if (!activity.name) return;
@@ -147,14 +150,16 @@ export const ActivityForm = ({
       )}
       {!showMore && <Hr />}
       <button onClick={handleAddNewActivity} type="submit">
-        {timed ? 'Start' : 'Add'} New Activity
+        {timed ? 'Start' : 'Create'} New Activity
       </button>
       {selectedEntry && (
         <>
-          <button onClick={handleSave} type="submit">
-            Save
-          </button>
-          <button onClick={handleRepeat}>Repeat</button>
+          {isEdited && <button onClick={handleSave}>Save</button>}
+          {((isTimedActivity(selectedEntry) &&
+            !isOngoingActivity(selectedEntry.collectionId)) ||
+            isActivity(selectedEntry)) && (
+            <button onClick={handleRepeat}>Repeat</button>
+          )}
         </>
       )}
     </InputContainer>

@@ -24,6 +24,8 @@ export interface UseEntriesData {
   removeOngoingActivity: (id: string) => void;
   selectEntry: (id: string | null) => void;
 
+  isOngoingActivity: (collectionId: string) => boolean;
+
   repeatEntry: (props: {collectionId: string}) => void;
   patchEntry: (props: {id: string; entry: AllPartialEntry}) => void;
   patchCollection: (props: {
@@ -108,27 +110,32 @@ export const useEntries = create(
         entries: [...entries, emotion],
       }));
     },
+    isOngoingActivity: (collectionId) => {
+      return get().ongoingActivities.some(
+        (activity) => activity.collectionId === collectionId
+      );
+    },
     repeatEntry: ({collectionId}) => {
       const entry = get().entries.find(
         (entry) => entry.collectionId === collectionId
       );
       const id = Math.random().toString();
 
-      if (entry) {
-        const newEntry: Entry = {...entry};
+      if (!entry) return;
 
-        const isTimed = isTimedActivity(newEntry);
-        if (isTimed) {
-          newEntry.startTime = new Date();
-          delete newEntry.stopTime;
-        }
+      const newEntry: Entry = {...entry};
 
-        set(({entries}) => ({
-          entries: [...entries, {...newEntry, id, collectionId}],
-        }));
-
-        if (!isTimed) return;
+      const isTimed = isTimedActivity(newEntry);
+      if (isTimed) {
+        newEntry.startTime = new Date();
+        delete newEntry.stopTime;
       }
+
+      set(({entries}) => ({
+        entries: [...entries, {...newEntry, id, collectionId}],
+      }));
+
+      if (!isTimed) return;
 
       // update ongoing activities
       const ongoingActivity = get().ongoingActivities.find(
@@ -142,6 +149,10 @@ export const useEntries = create(
               ? {...activity, id, stopTime: undefined}
               : activity
           ),
+        }));
+      } else {
+        set(({ongoingActivities}) => ({
+          ongoingActivities: [...ongoingActivities, newEntry],
         }));
       }
     },

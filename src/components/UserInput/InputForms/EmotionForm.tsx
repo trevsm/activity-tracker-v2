@@ -4,7 +4,8 @@ import {useEntries} from '../../../stores/useEntries';
 import {isEmotion} from '../../../stores/entryTypes';
 
 export const EmotionForm = ({handleClose}: {handleClose: () => void}) => {
-  const {addEmotion, selectedEntry, patchCollection} = useEntries();
+  const {addEmotion, selectedEntry, patchCollection, repeatEntry} =
+    useEntries();
 
   interface PartialEmotion {
     overall: string;
@@ -22,9 +23,17 @@ export const EmotionForm = ({handleClose}: {handleClose: () => void}) => {
 
   const [emotion, setEmotion] = useState<PartialEmotion>(initialEmotion);
 
+  const isEdited = JSON.stringify(emotion) !== JSON.stringify(initialEmotion);
+
   const handleAddNewEmotion = () => {
     if (!emotion.overall) return;
     addEmotion({...emotion});
+    handleClose();
+  };
+
+  const handleRepeat = () => {
+    if (!selectedEntry) return;
+    repeatEntry({collectionId: selectedEntry.collectionId});
     handleClose();
   };
 
@@ -65,9 +74,10 @@ export const EmotionForm = ({handleClose}: {handleClose: () => void}) => {
       </label>
       <button onClick={handleAddNewEmotion}>Add New</button>
       {selectedEntry && (
-        <button onClick={handleSave} type="submit">
-          Save
-        </button>
+        <>
+          {isEdited && <button onClick={handleSave}>Save</button>}
+          <button onClick={handleRepeat}>Repeat</button>
+        </>
       )}
     </InputContainer>
   );
