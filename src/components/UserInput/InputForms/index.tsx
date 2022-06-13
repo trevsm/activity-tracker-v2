@@ -13,6 +13,10 @@ export const InputContainer = styled.div`
   }
 `;
 
+export const ButtonWrapper = styled.div`
+  display: flex;
+`;
+
 export const Hr = styled.hr`
   margin: 10px 0;
 `;

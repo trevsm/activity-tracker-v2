@@ -152,7 +152,10 @@ export const useEntries = create(
         }));
       } else {
         set(({ongoingActivities}) => ({
-          ongoingActivities: [...ongoingActivities, newEntry],
+          ongoingActivities: [
+            ...ongoingActivities,
+            {...newEntry, id, collectionId},
+          ],
         }));
       }
     },

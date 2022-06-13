@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {InputContainer} from './index';
+import {ButtonWrapper, InputContainer} from './index';
 import {useEntries} from '../../../stores/useEntries';
 import {isEmotion} from '../../../stores/entryTypes';
 
@@ -72,13 +72,15 @@ export const EmotionForm = ({handleClose}: {handleClose: () => void}) => {
           onChange={handleDescriptionChange}
         ></textarea>
       </label>
-      <button onClick={handleAddNewEmotion}>Add New</button>
-      {selectedEntry && (
-        <>
-          {isEdited && <button onClick={handleSave}>Save</button>}
-          <button onClick={handleRepeat}>Repeat</button>
-        </>
-      )}
+      <ButtonWrapper>
+        <button onClick={handleAddNewEmotion}>Add New</button>
+        {selectedEntry && (
+          <>
+            {isEdited && <button onClick={handleSave}>Save</button>}
+            <button onClick={handleRepeat}>Repeat</button>
+          </>
+        )}
+      </ButtonWrapper>
     </InputContainer>
   );
 };

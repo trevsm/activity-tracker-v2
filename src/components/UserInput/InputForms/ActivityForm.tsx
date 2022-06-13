@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {InputContainer, Hr} from './index';
+import {InputContainer, Hr, ButtonWrapper} from './index';
 import {
   AdditionalData,
   isActivity,
@@ -149,19 +149,21 @@ export const ActivityForm = ({
         </>
       )}
       {!showMore && <Hr />}
-      <button onClick={handleAddNewActivity} type="submit">
-        {timed ? 'Start' : 'Create'} New Activity
-      </button>
-      {selectedEntry && (
-        <>
-          {isEdited && <button onClick={handleSave}>Save</button>}
-          {((isTimedActivity(selectedEntry) &&
-            !isOngoingActivity(selectedEntry.collectionId)) ||
-            isActivity(selectedEntry)) && (
-            <button onClick={handleRepeat}>Repeat</button>
-          )}
-        </>
-      )}
+      <ButtonWrapper>
+        <button onClick={handleAddNewActivity} type="submit">
+          {timed ? 'Start' : 'Create'} New Activity
+        </button>
+        {selectedEntry && (
+          <>
+            {isEdited && <button onClick={handleSave}>Save</button>}
+            {((isTimedActivity(selectedEntry) &&
+              !isOngoingActivity(selectedEntry.collectionId)) ||
+              isActivity(selectedEntry)) && (
+              <button onClick={handleRepeat}>Repeat</button>
+            )}
+          </>
+        )}
+      </ButtonWrapper>
     </InputContainer>
   );
 };
