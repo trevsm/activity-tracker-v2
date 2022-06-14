@@ -5,14 +5,16 @@ export interface OtherData {
 }
 
 export enum Sentiment {
-  Positive = 'positive',
-  Negative = 'negative',
-  Neutral = 'neutral',
-  Mixed = 'mixed',
-  Unknown = 'unknown',
+  Unset = '---',
+  Positive = 'Positive',
+  Negative = 'Negative',
+  Neutral = 'Neutral',
+  Mixed = 'Mixed',
+  Unknown = 'Unknown',
 }
 
 export enum Feeling {
+  Unset = '---',
   Great = '😀',
   Good = '🙂',
   Meh = '😐',

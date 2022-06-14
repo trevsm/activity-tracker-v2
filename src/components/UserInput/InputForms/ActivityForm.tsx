@@ -36,6 +36,7 @@ export const ActivityForm = ({
     color: '',
     otherData: {
       notes: '',
+      sentiment: Sentiment.Unset,
     },
   };
 
@@ -151,12 +152,13 @@ export const ActivityForm = ({
             setOtherData({sentiment: e.target.value as Sentiment})
           }
         >
-          <option value="">---</option>
-          {Object.keys(Sentiment).map((value, key) => (
-            <option key={key} value={value}>
-              {value}
-            </option>
-          ))}
+          {(Object.keys(Sentiment) as Array<keyof typeof Sentiment>).map(
+            (value, key) => (
+              <option key={key} value={Sentiment[value]}>
+                {Sentiment[value]}
+              </option>
+            )
+          )}
         </select>
       </label>
       <ButtonWrapper>

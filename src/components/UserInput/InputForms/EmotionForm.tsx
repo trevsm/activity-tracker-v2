@@ -12,7 +12,7 @@ export const EmotionForm = ({handleClose}: {handleClose: () => void}) => {
     description?: string;
   }
   const initialEmotion: PartialEmotion = {
-    overall: Feeling.Good,
+    overall: Feeling.Unset,
     description: '',
   };
 
@@ -61,7 +61,6 @@ export const EmotionForm = ({handleClose}: {handleClose: () => void}) => {
       <label>
         Overall:
         <select value={emotion.overall} onChange={handleOverallChange}>
-          <option value="">---</option>
           {(Object.keys(Feeling) as Array<keyof typeof Feeling>).map(
             (value, key) => (
               <option key={key} value={Feeling[value]}>
