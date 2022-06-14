@@ -3,7 +3,7 @@ import {persist} from 'zustand/middleware';
 import {
   Entry,
   Activity,
-  AdditionalData,
+  OtherData,
   Emotion,
   TimedActivity,
   AllPartialEntry,
@@ -16,15 +16,21 @@ export interface UseEntriesData {
   ongoingActivities: TimedActivity[];
   selectedEntry: Entry | null;
 
-  addActivity: (props: {name: string; additionalData?: AdditionalData}) => void;
+  addActivity: (props: {
+    name: string;
+    color: string;
+    otherData?: OtherData;
+  }) => void;
   addTimedActivity: (props: {
     name: string;
-    additionalData?: AdditionalData;
+    color: string;
+    otherData?: OtherData;
   }) => void;
   addEmotion: (props: {overall: Feeling; description?: string}) => void;
   removeOngoingActivity: (id: string) => void;
   selectEntry: (id: string | null) => void;
 
+  hasCollectionMembers: (id: string) => boolean;
   isOngoingActivity: (collectionId: string) => boolean;
 
   repeatEntry: (props: {collectionId: string}) => void;
@@ -41,7 +47,7 @@ export const useEntries = create(
     entries: [],
     ongoingActivities: [],
     selectedEntry: null,
-    addActivity: ({name, additionalData}) => {
+    addActivity: ({name, color, otherData}) => {
       const id = Math.random().toString();
       const collectionId = Math.random().toString();
       const timestamp = new Date();
@@ -50,7 +56,8 @@ export const useEntries = create(
         collectionId,
         timestamp,
         name,
-        additionalData,
+        color,
+        otherData,
       };
       set((state) => ({
         ...state,
@@ -71,7 +78,7 @@ export const useEntries = create(
         }));
       else set({selectedEntry: null});
     },
-    addTimedActivity: ({name, additionalData}) => {
+    addTimedActivity: ({name, color, otherData}) => {
       const id = Math.random().toString();
       const collectionId = Math.random().toString();
       const startTime = new Date();
@@ -80,7 +87,8 @@ export const useEntries = create(
         collectionId,
         startTime,
         name,
-        additionalData,
+        color,
+        otherData,
       };
 
       set((state) => ({
@@ -116,6 +124,12 @@ export const useEntries = create(
         (activity) => activity.collectionId === collectionId
       );
     },
+    hasCollectionMembers: (collectionId) => {
+      return (
+        get().entries.filter((entry) => entry.collectionId === collectionId)
+          .length > 1
+      );
+    },
     repeatEntry: ({collectionId}) => {
       const entry = get().entries.find(
         (entry) => entry.collectionId === collectionId
@@ -133,7 +147,10 @@ export const useEntries = create(
       }
 
       set(({entries}) => ({
-        entries: [...entries, {...newEntry, id, collectionId}],
+        entries: [
+          ...entries,
+          {...newEntry, id, collectionId, otherData: undefined},
+        ],
       }));
 
       if (!isTimed) return;
@@ -147,7 +164,11 @@ export const useEntries = create(
         set(({ongoingActivities}) => ({
           ongoingActivities: ongoingActivities.map((activity) =>
             activity.collectionId === collectionId
-              ? {...activity, id, stopTime: undefined}
+              ? {
+                  ...activity,
+                  id,
+                  stopTime: undefined,
+                }
               : activity
           ),
         }));

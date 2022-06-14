@@ -7,7 +7,6 @@ import {
   isTimedActivity,
   AllPartialEntry,
   TimedActivity,
-  Feeling,
 } from '../../stores/entryTypes';
 import styled from 'styled-components';
 import {AppProps} from '../../types';
@@ -32,7 +31,7 @@ interface BaseEntryProps extends AppProps {
 }
 
 const BaseEntry = ({children, style, entry}: BaseEntryProps) => {
-  const {timestamp, startTime, stopTime, additionalData} = entry;
+  const {timestamp, startTime, stopTime, color} = entry;
 
   const {selectEntry} = useEntries();
 
@@ -47,7 +46,7 @@ const BaseEntry = ({children, style, entry}: BaseEntryProps) => {
   };
 
   return (
-    <BgLi color={additionalData?.color} style={style} onClick={handleSelect}>
+    <BgLi color={color} style={style} onClick={handleSelect}>
       {children}
       {time && <span>timestamp: {time.toTimeString().split(' ')[0]}</span>}
       {(start || stop) && (

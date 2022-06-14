@@ -1,6 +1,5 @@
-export interface AdditionalData {
+export interface OtherData {
   [key: string]: any;
-  color?: string;
   notes?: string;
   sentiment?: Sentiment;
 }
@@ -27,7 +26,8 @@ interface GeneralActivity {
   id: string;
   collectionId: string;
   name: string;
-  additionalData?: AdditionalData;
+  color: string;
+  otherData?: OtherData;
 }
 
 export interface Activity extends GeneralActivity {

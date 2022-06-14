@@ -39,7 +39,7 @@ export const OngoingActivityElement = ({entry}: {entry: TimedActivity}) => {
   };
 
   return (
-    <BrLi color={entry.additionalData?.color}>
+    <BrLi color={entry.color}>
       <div className="main">
         <span className="name">{entry.name}</span>
         <PlayButtons>

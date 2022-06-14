@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
-import {InputContainer, Hr, ButtonWrapper} from './index';
+import {InputContainer, ButtonWrapper} from './index';
 import {
-  AdditionalData,
+  OtherData,
   isActivity,
   isTimedActivity,
   Sentiment,
@@ -17,21 +17,24 @@ export const ActivityForm = ({
 }) => {
   interface PartialActivity {
     name: string;
-    additionalData: AdditionalData;
+    color: string;
+    otherData: OtherData;
   }
   const {
     addActivity,
     addTimedActivity,
     selectedEntry,
     patchCollection,
+    patchEntry,
     repeatEntry,
     isOngoingActivity,
+    hasCollectionMembers,
   } = useEntries();
 
   const initialActivity: PartialActivity = {
     name: '',
-    additionalData: {
-      color: '#e0f0ff',
+    color: '',
+    otherData: {
       notes: '',
     },
   };
@@ -41,15 +44,12 @@ export const ActivityForm = ({
     (isActivity(selectedEntry) || isTimedActivity(selectedEntry))
   ) {
     initialActivity.name = selectedEntry.name;
-    if (selectedEntry.additionalData) {
-      initialActivity.additionalData = selectedEntry.additionalData;
+    initialActivity.color = selectedEntry.color;
+    if (selectedEntry.otherData) {
+      initialActivity.otherData = selectedEntry.otherData;
     }
   }
   const [activity, setActivity] = useState<PartialActivity>(initialActivity);
-
-  const [showMore, setShowMore] = useState(false);
-
-  const isEdited = JSON.stringify(activity) !== JSON.stringify(initialActivity);
 
   const handleAddNewActivity = () => {
     if (!activity.name) return;
@@ -68,23 +68,24 @@ export const ActivityForm = ({
 
   const handleSave = () => {
     if (selectedEntry) {
-      patchCollection({
-        collectionId: selectedEntry.collectionId,
-        entry: activity,
-      });
-      handleClose();
+      if (isMainEdited)
+        patchCollection({
+          collectionId: selectedEntry.collectionId,
+          entry: activity,
+        });
+      else if (isAnyEdited)
+        patchEntry({
+          id: selectedEntry.id,
+          entry: activity,
+        });
     }
   };
 
-  const handleToggleShowMore = () => {
-    setShowMore(!showMore);
-  };
-
-  const setAdditionalData = (props: any) => {
+  const setOtherData = (props: any) => {
     setActivity((prev) => ({
       ...prev,
-      additionalData: {
-        ...prev.additionalData,
+      otherData: {
+        ...prev.otherData,
         ...props,
       },
     }));
@@ -94,9 +95,25 @@ export const ActivityForm = ({
     setActivity(initialActivity);
   }, [selectedEntry]);
 
+  const isMainEdited =
+    activity.name !== initialActivity.name ||
+    activity.color !== initialActivity.color;
+
+  const isAnyEdited =
+    JSON.stringify(activity) !== JSON.stringify(initialActivity);
+
+  const isRepeatable =
+    selectedEntry && !isMainEdited
+      ? (!isMainEdited &&
+          isTimedActivity(selectedEntry) &&
+          !isOngoingActivity(selectedEntry.collectionId)) ||
+        isActivity(selectedEntry)
+      : false;
+
   return (
     <InputContainer>
       <h1>{timed && 'Timed'} Activity</h1>
+      <br />
       <label>
         Name:
         <input
@@ -107,62 +124,54 @@ export const ActivityForm = ({
           }
         />
       </label>
-      <p>More details:</p>
-      <button onClick={handleToggleShowMore}>
-        {showMore ? 'hide' : 'show'}
-      </button>
-      {showMore && (
-        <>
-          <Hr />
-          <label>
-            Color:
-            <input
-              type="color"
-              value={activity.additionalData.color}
-              onChange={(e) => setAdditionalData({color: e.target.value})}
-            />
-          </label>
-          <label>
-            Notes:
-            <textarea
-              rows={3}
-              value={activity?.additionalData?.notes}
-              onChange={(e) => setAdditionalData({notes: e.target.value})}
-            ></textarea>
-          </label>
-          <label>
-            Sentiment:
-            <select
-              value={activity?.additionalData.sentiment}
-              onChange={(e) =>
-                setAdditionalData({sentiment: e.target.value as Sentiment})
-              }
-            >
-              <option value="">---</option>
-              {Object.keys(Sentiment).map((value, key) => (
-                <option key={key} value={value}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          </label>
-        </>
-      )}
-      {!showMore && <Hr />}
+
+      <label>
+        Color:
+        <input
+          type="color"
+          value={activity.color}
+          onChange={(e) =>
+            setActivity((prev) => ({...prev, color: e.target.value}))
+          }
+        />
+      </label>
+      <label>
+        Notes:
+        <textarea
+          rows={3}
+          value={activity?.otherData?.notes}
+          onChange={(e) => setOtherData({notes: e.target.value})}
+        ></textarea>
+      </label>
+      <label>
+        Sentiment:
+        <select
+          value={activity?.otherData.sentiment}
+          onChange={(e) =>
+            setOtherData({sentiment: e.target.value as Sentiment})
+          }
+        >
+          <option value="">---</option>
+          {Object.keys(Sentiment).map((value, key) => (
+            <option key={key} value={value}>
+              {value}
+            </option>
+          ))}
+        </select>
+      </label>
       <ButtonWrapper>
-        <button onClick={handleAddNewActivity} type="submit">
+        <button onClick={handleAddNewActivity} disabled={!isMainEdited}>
           {timed ? 'Start' : 'Create'} New Activity
         </button>
-        {selectedEntry && (
-          <>
-            {isEdited && <button onClick={handleSave}>Save</button>}
-            {((isTimedActivity(selectedEntry) &&
-              !isOngoingActivity(selectedEntry.collectionId)) ||
-              isActivity(selectedEntry)) && (
-              <button onClick={handleRepeat}>Repeat</button>
-            )}
-          </>
+        {selectedEntry && isAnyEdited && (
+          <button onClick={handleSave}>
+            Save{' '}
+            {isMainEdited &&
+              hasCollectionMembers(selectedEntry.collectionId) &&
+              'All'}
+          </button>
         )}
+        {isRepeatable && <button onClick={handleRepeat}>Repeat</button>}
       </ButtonWrapper>
     </InputContainer>
   );
