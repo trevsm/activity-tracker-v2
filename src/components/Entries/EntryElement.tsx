@@ -13,7 +13,8 @@ import {AppProps} from '../../types';
 import {getTimeBetween} from '../../tools';
 import {useEntries} from '../../stores/useEntries';
 
-export const BgLi = styled.li<{color?: string}>`
+const StyledBaseEntry = styled.li<{color?: string; selected: boolean}>`
+  display: flex;
   background-color: ${(props) => (props.color ? props.color : '#fff')};
   padding: 10px;
   margin-bottom: 10px;
@@ -27,6 +28,12 @@ const H1 = styled.h1`
   margin-bottom: 10px;
 `;
 
+const ButtonWrapper = styled.div`
+  button {
+    margin-left: 10px;
+  }
+`;
+
 interface BaseEntryProps extends AppProps {
   entry: AllPartialEntry;
 }
@@ -34,7 +41,7 @@ interface BaseEntryProps extends AppProps {
 const BaseEntry = ({children, style, entry}: BaseEntryProps) => {
   const {timestamp, startTime, stopTime, color} = entry;
 
-  const {selectEntry} = useEntries();
+  const {selectEntry, selectedEntry, deleteEntry} = useEntries();
 
   const time = timestamp ? new Date(timestamp) : null;
   const start = startTime ? new Date(startTime) : null;
@@ -42,15 +49,50 @@ const BaseEntry = ({children, style, entry}: BaseEntryProps) => {
 
   const duration = start && stop ? getTimeBetween(start, stop) : null;
 
+  const isSelected = !!selectedEntry && selectedEntry.id == entry.id;
+
   const handleSelect = () => {
     if (entry.id) selectEntry(entry.id);
   };
 
+  const deleteAble = (start && stop) || (!start && !stop);
+
+  const handleDelete = () => {
+    if (!deleteAble) {
+      alert('Unable to delete. Pause or End before deleting.');
+      return;
+    }
+    if (window.confirm('Are you sure you want to delete entry?')) {
+      if (entry.id) deleteEntry(entry.id);
+    }
+  };
+
   return (
-    <BgLi color={color} style={style} onClick={handleSelect}>
-      {children}
-      {start && !stop && <div>in-progress...</div>}
-    </BgLi>
+    <StyledBaseEntry
+      color={color}
+      selected={isSelected}
+      style={style}
+      onClick={handleSelect}
+    >
+      <div>
+        {children}
+        {start && !stop && <div>in-progress...</div>}
+        {duration && (
+          <div>
+            {duration.hours !== 0 && <span>{duration.hours}h</span>}{' '}
+            {duration.minutes !== 0 && <span>{duration.minutes}m</span>}{' '}
+            {duration.seconds !== 0 && <span>{duration.seconds}s</span>}
+          </div>
+        )}
+      </div>
+      {isSelected && (
+        <ButtonWrapper>
+          <button onClick={handleDelete} disabled={!deleteAble}>
+            x
+          </button>
+        </ButtonWrapper>
+      )}
+    </StyledBaseEntry>
   );
 };
 

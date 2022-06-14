@@ -40,7 +40,7 @@ export interface UseEntriesData {
     collectionId: string;
     entry: AllPartialEntry;
   }) => void;
-  deleteEntry: (props: {id: string}) => void;
+  deleteEntry: (id: string) => void;
 }
 
 export const useEntries = create(
@@ -219,7 +219,7 @@ export const useEntries = create(
         }),
       }));
     },
-    deleteEntry: ({id}) => {
+    deleteEntry: (id) => {
       set((state) => ({
         ...state,
         entries: state.entries.filter((e) => e.id !== id),

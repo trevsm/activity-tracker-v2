@@ -52,6 +52,8 @@ export interface Emotion {
 
 export type Entry = Activity | TimedActivity | Emotion;
 
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
+
 export type AllPartialEntry = Partial<Activity> &
   Partial<TimedActivity> &
   Partial<Emotion>;

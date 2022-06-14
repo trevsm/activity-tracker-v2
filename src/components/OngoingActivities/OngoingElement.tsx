@@ -7,6 +7,7 @@ const PlayButtons = styled.div``;
 const BrLi = styled.li<{color?: string}>`
   border: 1px solid;
   margin-bottom: 10px;
+  pointer-events: auto;
   .main {
     border-left: 10px solid ${({color}) => color};
     padding: 5px 10px;
