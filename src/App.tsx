@@ -1,8 +1,9 @@
-import {useRef} from 'react';
+import {useEffect, useRef} from 'react';
 import styled from 'styled-components';
 import {EntryList} from './components/Entries/EntryList';
 import {OngoingActivities} from './components/OngoingActivities';
 import {UserInput} from './components/UserInput/UserInput';
+import {useEntries} from './stores/useEntries';
 
 const ClickLayer = styled.div`
   position: fixed;
@@ -19,6 +20,13 @@ const AppContainer = styled.div`
 
 function App() {
   const handleLayerClick = useRef<() => void>(() => {});
+
+  const {selectEntry} = useEntries();
+
+  useEffect(() => {
+    // re-initialize on refresh
+    selectEntry(null);
+  }, []);
 
   return (
     <>

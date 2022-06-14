@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import {isActivity, isEmotion, isTimedActivity} from '../../stores/entryTypes';
 import {useEntries} from '../../stores/useEntries';
+import {useGlobal} from '../../stores/useGlobal';
 import {ActivityForm} from './InputForms/ActivityForm';
 import {EmotionForm} from './InputForms/EmotionForm';
 
@@ -17,10 +18,17 @@ export function UserInput({
   type InputType = 'activity' | 'timedActivity' | 'emotion';
   const [type, setType] = useState<InputType | null>(null);
   const {selectedEntry, selectEntry} = useEntries();
+  const {entryEditPopup, setEntryEditPopup} = useGlobal();
 
   const handleClose = () => {
     setType(null);
     selectEntry(null);
+    setEntryEditPopup(false);
+  };
+
+  const handleOpen = (type: InputType) => {
+    selectType(type);
+    setEntryEditPopup(true);
   };
 
   const selectType = (type: InputType) => {
@@ -44,16 +52,20 @@ export function UserInput({
 
   return (
     <div>
-      {(type === 'activity' || type === 'timedActivity') && (
-        <ActivityForm {...{handleClose}} timed={type == 'timedActivity'} />
+      {entryEditPopup && (
+        <>
+          {(type === 'activity' || type === 'timedActivity') && (
+            <ActivityForm {...{handleClose}} timed={type == 'timedActivity'} />
+          )}
+          {type === 'emotion' && <EmotionForm {...{handleClose}} />}
+        </>
       )}
-      {type === 'emotion' && <EmotionForm {...{handleClose}} />}
       <ButtonWrapper>
-        <button onClick={() => selectType('activity')}>add activity</button>
-        <button onClick={() => selectType('timedActivity')}>
+        <button onClick={() => handleOpen('activity')}>add activity</button>
+        <button onClick={() => handleOpen('timedActivity')}>
           add timed activity
         </button>
-        <button onClick={() => selectType('emotion')}>add emotion</button>
+        <button onClick={() => handleOpen('emotion')}>add emotion</button>
       </ButtonWrapper>
     </div>
   );

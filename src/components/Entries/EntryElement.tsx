@@ -12,6 +12,7 @@ import styled from 'styled-components';
 import {AppProps} from '../../types';
 import {getTimeBetween} from '../../tools';
 import {useEntries} from '../../stores/useEntries';
+import {useGlobal} from '../../stores/useGlobal';
 
 const StyledBaseEntry = styled.li<{color?: string; selected: boolean}>`
   display: flex;
@@ -40,7 +41,7 @@ interface BaseEntryProps extends AppProps {
 
 const BaseEntry = ({children, style, entry}: BaseEntryProps) => {
   const {timestamp, startTime, stopTime, color} = entry;
-
+  const {setEntryEditPopup} = useGlobal();
   const {selectEntry, selectedEntry, deleteEntry} = useEntries();
 
   const time = timestamp ? new Date(timestamp) : null;
@@ -67,6 +68,10 @@ const BaseEntry = ({children, style, entry}: BaseEntryProps) => {
     }
   };
 
+  const handleEdit = () => {
+    setEntryEditPopup(true);
+  };
+
   return (
     <StyledBaseEntry
       color={color}
@@ -87,8 +92,9 @@ const BaseEntry = ({children, style, entry}: BaseEntryProps) => {
       </div>
       {isSelected && (
         <ButtonWrapper>
+          <button onClick={handleEdit}>edit</button>
           <button onClick={handleDelete} disabled={!deleteAble}>
-            x
+            del
           </button>
         </ButtonWrapper>
       )}
@@ -98,48 +104,46 @@ const BaseEntry = ({children, style, entry}: BaseEntryProps) => {
 
 const ActivityEntry = ({entry}: {entry: Activity}) => {
   return (
-    <div>
-      <BaseEntry entry={entry}>
-        <H1>
-          {entry.name} {entry.otherData?.notes ? '💬' : null}
-        </H1>
-      </BaseEntry>
-    </div>
+    <H1>
+      {entry.name} {entry.otherData?.notes ? '💬' : null}
+    </H1>
   );
 };
 
 const TimedActivityEntry = ({entry}: {entry: TimedActivity}) => {
   return (
-    <div>
-      <BaseEntry entry={entry}>
-        <H1>
-          {entry.name} {entry.otherData?.notes ? '💬' : null}{' '}
-          {entry.otherData?.sentiment}
-        </H1>
-      </BaseEntry>
-    </div>
+    <H1>
+      {entry.name} {entry.otherData?.notes ? '💬' : null}{' '}
+      {entry.otherData?.sentiment}
+    </H1>
   );
 };
 
 const EmotionEntry = ({entry}: {entry: Emotion}) => {
   return (
-    <div>
-      <BaseEntry entry={entry}>
-        {entry.overall} {entry.description ? '💬' : null}{' '}
-      </BaseEntry>
-    </div>
+    <>
+      {entry.overall} {entry.description ? '💬' : null}{' '}
+    </>
   );
 };
 
 export const EntryElement = ({entry}: {entry: Entry}) => {
-  if (isActivity(entry)) {
-    return <ActivityEntry entry={entry} />;
-  }
-  if (isTimedActivity(entry)) {
-    return <TimedActivityEntry entry={entry} />;
-  }
-  if (isEmotion(entry)) {
-    return <EmotionEntry entry={entry} />;
-  }
-  return <li>Unknown</li>;
+  const InnerEntry = () => {
+    if (isActivity(entry)) {
+      return <ActivityEntry entry={entry} />;
+    }
+    if (isTimedActivity(entry)) {
+      return <TimedActivityEntry entry={entry} />;
+    }
+    if (isEmotion(entry)) {
+      return <EmotionEntry entry={entry} />;
+    }
+    return <li>Unknown</li>;
+  };
+
+  return (
+    <BaseEntry entry={entry}>
+      <InnerEntry />
+    </BaseEntry>
+  );
 };
