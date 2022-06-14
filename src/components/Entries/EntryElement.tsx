@@ -19,6 +19,7 @@ export const BgLi = styled.li<{color?: string}>`
   margin-bottom: 10px;
   border: 1px solid;
   pointer-events: auto;
+  width: fit-content;
   cursor: pointer;
 `;
 
@@ -48,24 +49,7 @@ const BaseEntry = ({children, style, entry}: BaseEntryProps) => {
   return (
     <BgLi color={color} style={style} onClick={handleSelect}>
       {children}
-      {time && <span>timestamp: {time.toTimeString().split(' ')[0]}</span>}
-      {(start || stop) && (
-        <div>
-          {start && <div>start: {start.toTimeString().split(' ')[0]}</div>}
-          {!stop && <div>in-progress...</div>}
-          {stop && <div>stop: {stop.toTimeString().split(' ')[0]}</div>}
-          {duration && (
-            <div>
-              duration:{' '}
-              <span>
-                {duration.hours !== 0 && <span>{duration.hours}h</span>}
-                {duration.minutes !== 0 && <span>{duration.minutes}m</span>}
-                {duration.seconds !== 0 && <span>{duration.seconds}s</span>}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
+      {start && !stop && <div>in-progress...</div>}
     </BgLi>
   );
 };
@@ -74,7 +58,9 @@ const ActivityEntry = ({entry}: {entry: Activity}) => {
   return (
     <div>
       <BaseEntry entry={entry}>
-        <H1>{entry.name}</H1>
+        <H1>
+          {entry.name} {entry.otherData?.notes ? '💬' : null}
+        </H1>
       </BaseEntry>
     </div>
   );
@@ -84,7 +70,10 @@ const TimedActivityEntry = ({entry}: {entry: TimedActivity}) => {
   return (
     <div>
       <BaseEntry entry={entry}>
-        <H1>{entry.name}</H1>
+        <H1>
+          {entry.name} {entry.otherData?.notes ? '💬' : null}{' '}
+          {entry.otherData?.sentiment}
+        </H1>
       </BaseEntry>
     </div>
   );
@@ -92,10 +81,11 @@ const TimedActivityEntry = ({entry}: {entry: TimedActivity}) => {
 
 const EmotionEntry = ({entry}: {entry: Emotion}) => {
   return (
-    <BaseEntry entry={entry}>
-      <p>Overall: {entry.overall}</p>
-      <p>Description: {entry.description}</p>
-    </BaseEntry>
+    <div>
+      <BaseEntry entry={entry}>
+        {entry.overall} {entry.description ? '💬' : null}{' '}
+      </BaseEntry>
+    </div>
   );
 };
 

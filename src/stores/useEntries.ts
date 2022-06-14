@@ -9,6 +9,7 @@ import {
   AllPartialEntry,
   isTimedActivity,
   Feeling,
+  isActivity,
 } from './entryTypes';
 
 export interface UseEntriesData {
@@ -203,6 +204,9 @@ export const useEntries = create(
         ...state,
         entries: state.entries.map((e) => {
           if (e.collectionId === collectionId) {
+            if (isActivity(e) || isTimedActivity(e)) {
+              return {...e, ...entry, otherData: e.otherData};
+            }
             return {...e, ...entry};
           }
           return e;

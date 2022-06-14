@@ -23,8 +23,6 @@ export const EmotionForm = ({handleClose}: {handleClose: () => void}) => {
 
   const [emotion, setEmotion] = useState<PartialEmotion>(initialEmotion);
 
-  const isEdited = JSON.stringify(emotion) !== JSON.stringify(initialEmotion);
-
   const handleAddNewEmotion = () => {
     if (!emotion.overall) return;
     addEmotion({...emotion});
@@ -56,17 +54,26 @@ export const EmotionForm = ({handleClose}: {handleClose: () => void}) => {
     setEmotion(initialEmotion);
   }, [selectedEntry]);
 
+  const isAnyEdited =
+    JSON.stringify(emotion) !== JSON.stringify(initialEmotion);
+
+  const nonNullValues =
+    (emotion.description && emotion.description.length > 0) ||
+    emotion.overall !== Feeling.Unset;
+
   return (
     <InputContainer>
       <label>
         Overall:
         <select value={emotion.overall} onChange={handleOverallChange}>
+          <option value={Feeling.Unset}>---</option>
           {(Object.keys(Feeling) as Array<keyof typeof Feeling>).map(
-            (value, key) => (
-              <option key={key} value={Feeling[value]}>
-                {Feeling[value]}
-              </option>
-            )
+            (value, key) =>
+              key !== 0 && (
+                <option key={key} value={Feeling[value]}>
+                  {Feeling[value]} : {value}
+                </option>
+              )
           )}
         </select>
       </label>
@@ -79,11 +86,19 @@ export const EmotionForm = ({handleClose}: {handleClose: () => void}) => {
         ></textarea>
       </label>
       <ButtonWrapper>
-        <button onClick={handleAddNewEmotion}>Add New</button>
+        {isAnyEdited && (
+          <button onClick={handleAddNewEmotion} disabled={!nonNullValues}>
+            Add New
+          </button>
+        )}
         {selectedEntry && (
           <>
-            {isEdited && <button onClick={handleSave}>Save</button>}
-            <button onClick={handleRepeat}>Repeat</button>
+            {isAnyEdited && (
+              <button onClick={handleSave} disabled={!nonNullValues}>
+                Save
+              </button>
+            )}
+            {!isAnyEdited && <button onClick={handleRepeat}>Repeat</button>}
           </>
         )}
       </ButtonWrapper>

@@ -33,7 +33,7 @@ export const ActivityForm = ({
 
   const initialActivity: PartialActivity = {
     name: '',
-    color: '',
+    color: '#cdd3fe',
     otherData: {
       notes: '',
       sentiment: Sentiment.Unset,
@@ -72,7 +72,7 @@ export const ActivityForm = ({
       if (isMainEdited)
         patchCollection({
           collectionId: selectedEntry.collectionId,
-          entry: activity,
+          entry: {...activity, otherData: undefined},
         });
       else if (isAnyEdited)
         patchEntry({
@@ -152,12 +152,14 @@ export const ActivityForm = ({
             setOtherData({sentiment: e.target.value as Sentiment})
           }
         >
+          <option value={Sentiment.Unset}></option>
           {(Object.keys(Sentiment) as Array<keyof typeof Sentiment>).map(
-            (value, key) => (
-              <option key={key} value={Sentiment[value]}>
-                {Sentiment[value]}
-              </option>
-            )
+            (value, key) =>
+              key !== 0 && (
+                <option key={key} value={Sentiment[value]}>
+                  {value} : {Sentiment[value]}
+                </option>
+              )
           )}
         </select>
       </label>
