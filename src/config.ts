@@ -4,6 +4,7 @@ export const config = {
   pixelRatio,
   canvas: {
     grid: {
+      opacity: 0.015,
       size: {
         width: 7,
         height: 24,
@@ -17,8 +18,9 @@ export const config = {
       radius: 10 * pixelRatio,
     },
     shroud: {
-      offset: 2 * pixelRatio, // offset from edge of ongoing timeblock
+      dashed: false,
       lineWidth: 2 * pixelRatio,
+      offset: 0, // offset from edge of ongoing timeblock
       lineDash: {
         opacity: 0.1,
         width: 5 * pixelRatio,

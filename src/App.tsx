@@ -12,7 +12,7 @@ function App() {
 
     draw.timeblock({
       col: 1,
-      color: '#9bff98',
+      color: '#98ffd9',
       startTime: new Date('06/14/2022 17:00:00'),
       endTime: new Date(today + ' 1:00:00'),
     });

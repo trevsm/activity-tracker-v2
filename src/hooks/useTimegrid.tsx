@@ -3,22 +3,21 @@ import {grid, roundRect, shadeColor} from '../tools';
 import styled from 'styled-components';
 import {config} from '../config';
 
-const grey = '#f1f1f1';
 const maxWidth = 800;
 const width = window.innerWidth <= maxWidth ? window.innerWidth : maxWidth;
 
 const {
   pixelRatio,
   canvas: {
-    grid: {gap, pxHeight, size: gridSize},
+    grid: {gap, pxHeight, size: gridSize, opacity},
     timeblock: {padding, outlineWidth, radius},
-    shroud: {offset, lineDash, lineWidth},
+    shroud: {offset, dashed, lineDash, lineWidth},
   },
 } = config;
 
 const CanvasWrapper = styled.div<{width: number}>`
   overflow: hidden;
-  background: #e5e5e5;
+  background: rgba(0, 0, 0, ${opacity});
   width: 100vw;
   max-width: ${({width}) => width + 'px'};
   height: ${window.innerHeight - 1}px;
@@ -35,7 +34,7 @@ export function useTimegrid() {
     config: {canvasSize},
   } = useCanvas({
     canvasSize: {width: width * pixelRatio - 4, height: pxHeight},
-    style: {backgroundColor: grey},
+    style: {backgroundColor: `rgba(0, 0, 0, ${opacity})`},
   });
 
   const ratio = {
@@ -126,17 +125,23 @@ export function useTimegrid() {
       ctx.current.globalAlpha = 0.1;
 
       ctx.current.fillStyle = '#000000';
-      ctx.current.fillRect(0, curr + gap / 2, canvasSize.width, ratio.y * 24);
+      ctx.current.fillRect(
+        0,
+        curr - gap + offset / 2,
+        canvasSize.width,
+        ratio.y * 24
+      );
 
-      ctx.current.globalAlpha = lineDash.opacity;
-
-      ctx.current.lineWidth = lineWidth;
-      ctx.current.beginPath();
-      ctx.current.setLineDash([lineDash.width, lineDash.spacing]);
-      ctx.current.moveTo(0, curr + offset);
-      ctx.current.lineTo(canvasSize.width, curr + offset);
-      ctx.current.stroke();
-      ctx.current.setLineDash([]);
+      if (dashed) {
+        ctx.current.globalAlpha = lineDash.opacity;
+        ctx.current.lineWidth = lineWidth;
+        ctx.current.beginPath();
+        ctx.current.setLineDash([lineDash.width, lineDash.spacing]);
+        ctx.current.moveTo(0, curr + offset);
+        ctx.current.lineTo(canvasSize.width, curr + offset);
+        ctx.current.stroke();
+        ctx.current.setLineDash([]);
+      }
 
       ctx.current.globalAlpha = 1;
     },
