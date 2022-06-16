@@ -16,6 +16,7 @@ const {
 } = config;
 
 const CanvasWrapper = styled.div<{width: number}>`
+  position: relative;
   overflow: hidden;
   background: rgba(0, 0, 0, ${opacity});
   width: 100vw;
@@ -24,6 +25,23 @@ const CanvasWrapper = styled.div<{width: number}>`
   overflow-x: hidden;
   overflow-y: auto;
   margin: 0 auto;
+  .times {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    color: #878787;
+    padding-right: 20px;
+    font-family: monospace;
+    div.time {
+      position: relative;
+      height: 100%;
+      div.label {
+        position: sticky;
+        top: 0;
+        padding: 5px;
+      }
+    }
+  }
 `;
 
 export function useTimegrid() {
@@ -154,6 +172,21 @@ export function useTimegrid() {
   return {
     Canvas: () => (
       <CanvasWrapper width={canvasSize.width}>
+        <div
+          className="times"
+          style={{
+            height:
+              canvasSize.height / pixelRatio + padding / pixelRatio + 'px',
+          }}
+        >
+          {Array(24)
+            .fill(null)
+            .map((_, i) => (
+              <div key={i} className="time">
+                <div className="label">{i < 10 ? `0${i}:00` : `${i}:00`}</div>
+              </div>
+            ))}
+        </div>
         <Canvas />
       </CanvasWrapper>
     ),

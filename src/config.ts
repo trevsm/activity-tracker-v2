@@ -6,10 +6,10 @@ export const config = {
     grid: {
       opacity: 0.015,
       size: {
-        width: 7,
+        width: 8,
         height: 24,
       },
-      pxHeight: 1000 * pixelRatio,
+      pxHeight: 1500 * pixelRatio,
       gap: 1 * pixelRatio,
     },
     timeblock: {

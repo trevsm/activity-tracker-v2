@@ -8,33 +8,33 @@ function App() {
     draw.bgGrid();
     draw.greyShroud();
 
-    const today = '06/15/2022';
+    const today = '06/16/2022';
 
     draw.timeblock({
-      col: 1,
+      col: 2,
       color: '#98ffd9',
-      startTime: new Date('06/14/2022 17:00:00'),
+      startTime: new Date('06/15/2022 0:00:00'),
       endTime: new Date(today + ' 1:00:00'),
     });
 
     draw.timeblock({
-      col: 1,
+      col: 2,
       color: '#98b4ff',
       startTime: new Date(today + ' 8:00:00'),
       endTime: new Date(today + ' 12:00:00'),
     });
 
     draw.timeblock({
-      col: 2,
+      col: 3,
       color: '#ff9c98',
       startTime: new Date(today + ' 9:00:00'),
       endTime: new Date(today + ' 13:20:00'),
     });
 
     draw.timeblock({
-      col: 1,
+      col: 2,
       color: '#98b4ff',
-      startTime: new Date(today + ' 17:00:00'),
+      startTime: new Date(today + ' 14:00:00'),
       endTime: null,
     });
   }, []);
