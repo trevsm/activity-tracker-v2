@@ -110,7 +110,7 @@ export function useTimegrid() {
             ctx.current.fillRect(
               x * ratio.x + gap,
               y * ratio.y + gap,
-              ratio.x - gap,
+              ratio.x,
               ratio.y - gap
             );
         },
