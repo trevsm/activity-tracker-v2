@@ -22,12 +22,14 @@ export function useCanvas(props: CanvasProps) {
     [props]
   );
 
-  const fn = {
+  const draw = {
     clear: () => {
       if (!ctx.current) return;
       ctx.current.clearRect(0, 0, size.width, size.height);
     },
   };
+
+  const fn = {};
 
   const setCanvasSize = () => {
     if (!canvas.current) return;
@@ -35,6 +37,10 @@ export function useCanvas(props: CanvasProps) {
     canvas.current.width = size.width;
     canvas.current.height = size.height;
   };
+
+  useEffect(() => {
+    setCanvasSize();
+  }, [size]);
 
   useEffect(() => {
     if (!canvas.current) return;
@@ -45,16 +51,13 @@ export function useCanvas(props: CanvasProps) {
     ctx.current = context;
   }, []);
 
-  useEffect(() => {
-    setCanvasSize();
-  }, [size]);
-
   return {
     config: {
       canvasSize: size,
     },
     Canvas: () => Canvas,
     ctx,
+    draw: {...draw},
     fn: {
       setSize,
       ...fn,

@@ -1,45 +1,43 @@
-import {useEffect, useRef} from 'react';
-import styled from 'styled-components';
-import {EntryList} from './components/Entries/EntryList';
-import {OngoingActivities} from './components/OngoingActivities';
-import {UserInput} from './components/UserInput/UserInput';
-import {useEntries} from './stores/useEntries';
-
-const ClickLayer = styled.div`
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-`;
-
-const AppContainer = styled.div`
-  position: relative;
-  pointer-events: none;
-`;
+import {useEffect} from 'react';
+import {useTimegrid} from './hooks/useTimegrid';
 
 function App() {
-  const handleLayerClick = useRef<() => void>(() => {});
-
-  const {selectEntry} = useEntries();
+  const {Canvas, draw} = useTimegrid();
 
   useEffect(() => {
-    // re-initialize on refresh
-    selectEntry(null);
+    draw.bgGrid();
+    draw.greyShroud();
+
+    draw.timeblock({
+      col: 1,
+      color: '#9bff98',
+      startTime: new Date('06/14/2022 17:00:00'),
+      endTime: new Date('06/15/2022 1:00:00'),
+    });
+
+    draw.timeblock({
+      col: 1,
+      color: '#98b4ff',
+      startTime: new Date('06/15/2022 8:00:00'),
+      endTime: new Date('06/15/2022 12:00:00'),
+    });
+
+    draw.timeblock({
+      col: 2,
+      color: '#ff9c98',
+      startTime: new Date('06/15/2022 9:00:00'),
+      endTime: new Date('06/15/2022 13:20:00'),
+    });
+
+    draw.timeblock({
+      col: 1,
+      color: '#98b4ff',
+      startTime: new Date('06/15/2022 17:00:00'),
+      endTime: null,
+    });
   }, []);
 
-  return (
-    <>
-      <ClickLayer onClick={() => handleLayerClick.current()} />
-      <AppContainer>
-        <div style={{display: 'flex'}}>
-          <EntryList />
-          <OngoingActivities />
-        </div>
-        <UserInput handleLayerClick={handleLayerClick} />
-      </AppContainer>
-    </>
-  );
+  return <Canvas />;
 }
 
 export default App;
