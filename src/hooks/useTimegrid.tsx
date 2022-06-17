@@ -4,11 +4,9 @@ import styled from 'styled-components';
 import {config} from '../config';
 import {useEffect, useRef} from 'react';
 
-const windowWidth = window.innerWidth;
-const windowHeight = window.innerHeight - 65; // 65px for the header
-
 const {
   pixelRatio,
+  header: {height},
   canvas: {
     grid: {
       gap,
@@ -22,6 +20,9 @@ const {
     shroud: {offset, dashed, lineDash, lineWidth},
   },
 } = config;
+
+const windowWidth = window.innerWidth;
+const windowHeight = window.innerHeight - height;
 
 const CanvasWrapper = styled.div<{width: number}>`
   position: relative;

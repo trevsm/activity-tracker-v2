@@ -1,12 +1,17 @@
 import styled from 'styled-components';
+import {config} from '../../config';
+
+const {
+  header: {height},
+} = config;
 
 const StyledHeader = styled.header`
   z-index: 1;
   position: relative;
-  height: 65px;
-  max-height: 100px;
-  padding: 20px;
+  height: ${height}px;
+  max-height: ${height}px;
   box-shadow: 0 0 35px -25px black;
+  padding: 20px;
 
   .date {
     letter-spacing: 1px;

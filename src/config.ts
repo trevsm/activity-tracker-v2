@@ -2,6 +2,9 @@ const pixelRatio = Math.ceil(window.devicePixelRatio);
 
 export const config = {
   pixelRatio,
+  header: {
+    height: 65,
+  },
   canvas: {
     grid: {
       lineColor: '#e5e5e5',
