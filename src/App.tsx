@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import {AddButtons} from './components/AddButtons/AddButtons';
 import {Header} from './components/Header/Header';
 import {useTimegrid} from './hooks/useTimegrid';
 
@@ -10,6 +11,7 @@ function App() {
   return (
     <AppContainer>
       <Header />
+      <AddButtons />
       <Canvas />
     </AppContainer>
   );
