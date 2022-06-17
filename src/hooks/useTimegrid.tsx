@@ -1,15 +1,23 @@
 import {useCanvas} from './useCanvas';
-import {grid, roundRect, shadeColor} from '../tools';
+import {grid, roundRect, shadeColor, to12Hour} from '../tools';
 import styled from 'styled-components';
 import {config} from '../config';
+import {useEffect, useRef} from 'react';
 
-const maxWidth = 800;
-const width = window.innerWidth <= maxWidth ? window.innerWidth : maxWidth;
+const windowWidth = window.innerWidth;
+const windowHeight = window.innerHeight - 65; // 65px for the header
 
 const {
   pixelRatio,
   canvas: {
-    grid: {gap, pxHeight, size: gridSize, opacity},
+    grid: {
+      gap,
+      pxHeight,
+      size: gridSize,
+      lineColor,
+      offset: gridOffset,
+      fontColor,
+    },
     timeblock: {padding, outlineWidth, radius},
     shroud: {offset, dashed, lineDash, lineWidth},
   },
@@ -18,10 +26,9 @@ const {
 const CanvasWrapper = styled.div<{width: number}>`
   position: relative;
   overflow: hidden;
-  background: rgba(0, 0, 0, ${opacity});
   width: 100vw;
   max-width: ${({width}) => width + 'px'};
-  height: ${window.innerHeight - 1}px;
+  height: ${windowHeight - 1}px;
   overflow-x: hidden;
   overflow-y: auto;
   margin: 0 auto;
@@ -29,16 +36,18 @@ const CanvasWrapper = styled.div<{width: number}>`
     position: absolute;
     display: flex;
     flex-direction: column;
-    color: #878787;
-    padding-right: 20px;
-    font-family: monospace;
+    padding-right: 10px;
+    border-right: 1px solid ${lineColor};
     div.time {
       position: relative;
       height: 100%;
       div.label {
-        position: sticky;
-        top: 0;
+        font-size: 12px;
         padding: 5px;
+        min-width: 50px;
+        text-align: center;
+        background: white;
+        color: ${fontColor};
       }
     }
   }
@@ -49,10 +58,10 @@ export function useTimegrid() {
     Canvas,
     ctx,
     fn: dFn,
+    draw: dDraw,
     config: {canvasSize},
   } = useCanvas({
-    canvasSize: {width: width * pixelRatio - 4, height: pxHeight},
-    style: {backgroundColor: `rgba(0, 0, 0, ${opacity})`},
+    canvasSize: {width: windowWidth * pixelRatio - 4, height: pxHeight},
   });
 
   const ratio = {
@@ -61,6 +70,7 @@ export function useTimegrid() {
   };
 
   const draw = {
+    ...dDraw,
     timeblock: ({
       col,
       startTime,
@@ -123,13 +133,13 @@ export function useTimegrid() {
         rows: Math.round(canvasSize.height / ratio.y),
         cols: Math.round(canvasSize.width / ratio.x),
         callback: ({x, y}) => {
-          if (ctx.current)
-            ctx.current.fillRect(
-              x * ratio.x + gap,
-              y * ratio.y + gap,
-              ratio.x,
-              ratio.y - gap
-            );
+          if (!ctx.current || x !== 0) return;
+
+          ctx.current.strokeStyle = lineColor;
+          ctx.current.beginPath();
+          ctx.current.moveTo(0, y * ratio.y + gridOffset);
+          ctx.current.lineTo(canvasSize.width, y * ratio.y + gridOffset);
+          ctx.current.stroke();
         },
       });
     },
@@ -169,6 +179,23 @@ export function useTimegrid() {
     ...dFn,
   };
 
+  const initialize = () => {
+    draw.clear();
+    draw.bgGrid();
+  };
+
+  const resizeRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    initialize();
+    window.addEventListener('resize', () => {
+      if (resizeRef.current) clearTimeout(resizeRef.current);
+      resizeRef.current = setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    });
+  }, []);
+
   return {
     Canvas: () => (
       <CanvasWrapper width={canvasSize.width}>
@@ -183,7 +210,7 @@ export function useTimegrid() {
             .fill(null)
             .map((_, i) => (
               <div key={i} className="time">
-                <div className="label">{i < 10 ? `0${i}:00` : `${i}:00`}</div>
+                <div className="label">{to12Hour(i)}</div>
               </div>
             ))}
         </div>

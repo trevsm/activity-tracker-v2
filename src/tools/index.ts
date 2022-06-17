@@ -126,3 +126,17 @@ export function addHours(numOfHours: number, date = new Date()) {
 
   return date;
 }
+
+export function to12Hour(hour: number) {
+  let h = '';
+  if (hour === 0) {
+    h = '12 AM';
+  } else if (hour == 12) {
+    h = '12 PM';
+  } else if (hour > 12) {
+    h = `${hour - 12} PM`;
+  } else {
+    h = `${hour} AM`;
+  }
+  return h;
+}

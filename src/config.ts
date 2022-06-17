@@ -4,7 +4,9 @@ export const config = {
   pixelRatio,
   canvas: {
     grid: {
-      opacity: 0.015,
+      lineColor: '#e5e5e5',
+      fontColor: '#70757a',
+      offset: 12 * pixelRatio,
       size: {
         width: 8,
         height: 24,
